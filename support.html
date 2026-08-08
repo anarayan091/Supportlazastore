@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laza Store - مركز الدعم</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{min-height:100vh;background:#f4f6f9;padding:20px}
+.container{width:100%;max-width:550px;margin:30px auto}
+.header{text-align:center;margin-bottom:20px}
+.logo{width:70px;height:70px;margin:auto;background:#2563eb;color:#fff;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold}
+.header h1{margin-top:15px;color:#111827;font-size:26px}
+.header p{margin-top:8px;color:#6b7280;font-size:14px}
+.card{background:#fff;padding:25px;border-radius:16px;box-shadow:0 5px 25px rgba(0,0,0,.1)}
+.card h2{color:#111827;margin-bottom:8px}.description{color:#6b7280;font-size:14px;margin-bottom:20px;line-height:1.6}
+label{display:block;margin-top:14px;margin-bottom:6px;font-size:14px;font-weight:bold;color:#374151}
+input,select,textarea,button{width:100%;padding:13px;border-radius:9px;border:1px solid #d1d5db;font-size:15px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb}
+textarea{min-height:120px;resize:vertical}
+button{margin-top:20px;background:#2563eb;color:#fff;border:none;cursor:pointer;font-weight:bold}
+button:disabled{background:#9ca3af;cursor:not-allowed}
+#status{margin-top:15px;text-align:center;font-weight:bold;line-height:1.6}
+.footer{text-align:center;margin-top:18px;color:#9ca3af;font-size:12px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="logo">L</div><h1>Laza Store</h1><p>مركز الدعم والمساعدة</p></div>
+<div class="card">
+<h2>🆘 كيف يمكننا مساعدتك؟</h2>
+<p class="description">أرسل لنا تفاصيل مشكلتك وسنقوم بمراجعة طلبك والرد عليك عبر البريد الإلكتروني.</p>
+<form id="supportForm">
+<label>اسم المستخدم</label>
+<input type="text" name="username" placeholder="أدخل اسم المستخدم" required>
+<label>رقم الطلب</label>
+<input type="text" name="order_id" placeholder="مثال: ORD-123456" required>
+<label>البريد الإلكتروني</label>
+<input type="email" name="email" placeholder="أدخل بريدك الإلكتروني" required>
+<label>نوع المشكلة</label>
+<select name="problem" required>
+<option value="">اختر نوع المشكلة</option>
+<option value="تأخر الطلب">⏳ تأخر الطلب</option>
+<option value="فشل الشحن">❌ فشل الشحن</option>
+<option value="مشكلة في المنتج">📦 مشكلة في المنتج</option>
+<option value="مشكلة في الدفع">💳 مشكلة في الدفع</option>
+<option value="طلب استرداد">💰 طلب استرداد</option>
+<option value="مشكلة أخرى">❓ مشكلة أخرى</option>
+</select>
+<label>شرح المشكلة</label>
+<textarea name="message" placeholder="اشرح لنا المشكلة بالتفصيل..." required></textarea>
+<button type="submit">إرسال طلب الدعم</button>
+</form>
+<div id="status"></div>
+</div>
+<div class="footer">Laza Store © 2026 — جميع الحقوق محفوظة</div>
+</div>
+<script>
+emailjs.init({publicKey:"lIJCM6PpQ7iUHlJI8"});
+let sending=false;
+const ADMIN_TEMPLATE_ID="ضع_هنا_ID_قالب_الإدارة";
+const USER_TEMPLATE_ID="ضع_هنا_ID_قالب_الزبون";
+document.getElementById("supportForm").addEventListener("submit",function(e){
+e.preventDefault();
+const form=this,btn=form.querySelector("button"),status=document.getElementById("status");
+if(sending)return;
+sending=true;btn.disabled=true;btn.innerHTML="⏳ جاري إرسال طلب الدعم...";
+const ticketId="SUP-"+Date.now()+"-"+Math.floor(Math.random()*10000);
+const data={
+ticket_id:ticketId,
+order_id:form.order_id.value.trim(),
+username:form.username.value.trim(),
+email:form.email.value.trim(),
+problem:form.problem.value,
+message:form.message.value.trim(),
+date:new Date().toLocaleString("ar-MA")
+};
+emailjs.send("service_rhsuhtu",ADMIN_TEMPLATE_ID,data)
+.then(()=>emailjs.send("service_rhsuhtu",USER_TEMPLATE_ID,data))
+.then(()=>{
+status.innerHTML="✅ تم إرسال طلب الدعم بنجاح.<br><br>🎫 رقم التذكرة:<br><b>"+ticketId+"</b><br><br>📩 ستتوصل برسالة تأكيد عبر بريدك الإلكتروني.";
+form.reset();btn.disabled=false;btn.innerHTML="إرسال طلب الدعم";sending=false;
+})
+.catch((error)=>{
+console.log(error);status.innerHTML="❌ تعذر إرسال طلب الدعم.<br>يرجى المحاولة مرة أخرى.";
+btn.disabled=false;btn.innerHTML="إرسال طلب الدعم";sending=false;
+});
+});
+</script>
+</body>
+</html>
